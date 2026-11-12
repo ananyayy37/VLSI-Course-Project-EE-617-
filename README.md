@@ -2,12 +2,6 @@
 We implemented the research paper on CICAM operation named "CICAM: A Reconfigurable SRAM-Based Computing-in-Content-Addressable Memory Architecture Using Charge Sharing" on Cadence Virtuoso at 28nm node CMOS Technology.
 # 4×4 CICAM Array - Vector File Instructions
 
-Vector (`.vec`) stimulus files for the 4×4 CICAM (Computing-in-Content-Addressable Memory) array built in Cadence Virtuoso (`vlsi_project` → `4x4_CICAM`).
-
-**Authors:** Ananya Anilkumar Pawar (24110037), Hari Nisanth S (24110129)
-**Instructor:** Prof. Joycee Mekie
-
-
 ## Files at a glance (path for all is /home/hari)
 
 | File | Operation | MODE | S2 S1 S0 | Enable to pulse | Expected result |
