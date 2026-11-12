@@ -47,16 +47,6 @@ The sense amplifier **precharges its outputs when the enable is 0 and evaluates 
 2. **Keep the enable LOW during write and precharge phases.**
 3. **Read r0–r3 / cam0–cam3 only while the enable is high.** When it is low, the outputs just show the SA precharge value.
 4. Keep the enable pulse inside the evaluation window, and turn it off before the next precharge.
-
-Suggested pulse windows for the files below (adjust the `delay` and `width` of the pulse source):
-
-| File | Evaluation window in vectors | `eno` high | `camen` high |
-|---|---|---|---|
-| `write_read_0101_4_4x4.vec` | RWL0 on from 2.0 ns | ~2.4 ns → end | — |
-| `nor_cim_4x4_6_final.vec` | 3.2 – 6.2 ns | ~3.6 – 6.0 ns | — |
-| `cam_4x4_10_final.vec` | 2.7 – 5.7 ns | — | ~3.1 – 5.5 ns |
-| `cim_cam_ananya_version_5.vec` | CIM 3.2 – 6.2 ns, CAM 12.5 – 13.5 ns | ~3.6 – 6.0 ns | ~12.9 – 13.5 ns |
-
 ---
 
 ## Operating modes (from the CICAM cell)
