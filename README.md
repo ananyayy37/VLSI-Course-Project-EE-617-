@@ -8,7 +8,7 @@ Vector (`.vec`) stimulus files for the 4×4 CICAM (Computing-in-Content-Addressa
 **Instructor:** Prof. Joycee Mekie
 
 
-## Files at a glance
+## Files at a glance (path for all is /home/hari)
 
 | File | Operation | MODE | S2 S1 S0 | Enable to pulse | Expected result |
 |---|---|---|---|---|---|
@@ -23,11 +23,11 @@ Vector (`.vec`) stimulus files for the 4×4 CICAM (Computing-in-Content-Addressa
 
 | Signal | Meaning |
 |---|---|
-| `r0 r1 r2 r3` | **CIM / read outputs.** Final digital result from the output circuit (sense amplifiers → logic → 8:1 MUX) of columns 0–3. These are only valid while `eno` is high. |
-| `cam0 cam1 cam2 cam3` | **CAM outputs.** Match result of rows 0–3, sensed from ML0–ML3 by the CAM sense amplifiers. 1 = match (ML stayed high), 0 = mismatch (ML discharged). These are only valid while `camen` is high. |
+| `r0 r1 r2 r3` | **CIM / read outputs.** Final digital result from the output circuit (sense amplifiers to logic → 8:1 MUX) of columns 0–3. These are only valid while `eno (enable)` is high. |
+| `cam0 cam1 cam2 cam3` | **CAM outputs.** Match result of rows 0–3, sensed from ML0–ML3 by the CAM sense amplifiers. 1 = match (ML stayed high), 0 = mismatch (ML discharged). These are only valid while `camen (cam enable) ` is high. |
 | `ML0–ML3` | Match lines of rows 0–3. Precharged high, then left floating during a search. |
 | `RBL0–3`, `RBLB0–3`, `CRL0–3` | Analog bitline and charge-redistribution levels (V<sub>DD</sub>, ⅔V<sub>DD</sub>, ½V<sub>DD</sub>) during CIM. Useful for debugging; the digital answer is on r0–r3. |
-| `a0–a3`, `b0–b3` | Internal storage nodes (Q) of Row 0 and Row 1. Probe these to confirm a write actually happened. |
+| `a0–a3`, `b0–b3` | Internal storage nodes (Q) of Row 0 and Row 1. Prefer to probe these to confirm a write actually happened. |
 
 Bit order: index 0 is column 0, which is the **first** value of each 4-bit group in the vector file. For example, `BL0 BL1 BL2 BL3 = 0 1 0 1` stores the word 0101, and `r0` is the result for that leftmost bit.
 
@@ -40,16 +40,16 @@ Bit order: index 0 is column 0, which is the **first** value of each 4-bit group
 | `eno` | Pulse source (0 V → 0.9 V) | Enable for the output-circuit sense amplifiers. **See the timing rule below.** |
 | `camen` | Pulse source (0 V → 0.9 V) | Enable for the CAM sense amplifiers on ML0–ML3. **See the timing rule below.** |
 | `Vref` | DC 0.75 V | SA reference; must sit between ⅔V<sub>DD</sub> and V<sub>DD</sub>. |
-| `S2 S1 S0` | DC sources, **only for `write_read_0101_4_4x4.vec`** | Set to 0 0 0 (READ). The CIM files already drive S2 S1 S0 from the vector file. |
-| `vdd`, `gnd` | Driven by the vector file (vih = 0.9 V) | Do **not** also put a DC source on Vdd, or Spectre gives *SPECTRE-620: Node Vdd driven by multiple voltage sources*. If you keep one, it must also be 0.9 V. |
+| `S2 S1 S0` | DC sources, **only for `write_read_0101_4_4x4.vec`** | Set to 0 0 0 (READ). The other CIM files already drive S2 S1 S0 from the vector file. |
+| `vdd`, `gnd` | Driven by the vector file (vih = 0.9 V) | Do **not** also put a DC source on Vdd, or Spectre gives error as:  *SPECTRE-620: Node Vdd driven by multiple voltage sources*
 
 ---
 
-## ⚠️ Enable timing rule (eno / camen) – read this first
+## Enable timing rule (eno / camen)
 
 The sense amplifier **precharges its outputs when the enable is 0 and evaluates when it is 1**. It latches whatever is on its inputs at the moment the enable rises. Therefore:
 
-1. **Turn `eno` / `camen` ON only AFTER the read / compute / search has developed**: after RWL (and RWL_CIM) are asserted and the bitlines or match lines have settled. Leave about **300–500 ps** after the word lines rise. If the enable rises too early, the SA latches the precharged (all-high) lines and gives a wrong result.
+1. ** Ensure that `eno` / `camen` is ON only AFTER the read / compute / search has developed**: after RWL (and RWL_CIM) are asserted and the bitlines or match lines have settled. If the enable rises too early, the SA latches the precharged (all-high) lines and gives a wrong result.
 2. **Keep the enable LOW during write and precharge phases.**
 3. **Read r0–r3 / cam0–cam3 only while the enable is high.** When it is low, the outputs just show the SA precharge value.
 4. Keep the enable pulse inside the evaluation window, and turn it off before the next precharge.
@@ -90,10 +90,6 @@ Suggested pulse windows for the files below (adjust the `delay` and `width` of t
 | 110 | XOR | 0110 |
 | 111 | XNOR | 1001 |
 
-To try a different operation in the CIM files, change the last three columns (`S2 S1 S0`) on **every** vector line.
-
----
-
 ## Per-file instructions
 
 ### 1. `write_read_0101_4_4x4.vec` – write and read
@@ -107,9 +103,7 @@ To try a different operation in the CIM files, change the last three columns (`S
 | 2.0 – 2.2 | Read Row 0 (RWL0 = RWL_CIM0 = 1) |
 
 - Set **S2 S1 S0 = 000** with DC sources in the schematic, because they are not in this vector file.
-- Pulse **`eno` after ~2.4 ns**.
 - **Check:** a0–a3 = 0101 after the write; **r0 r1 r2 r3 = 0 1 0 1** while `eno` is high.
-- Transient stop: about 4–5 ns.
 
 ### 2. `nor_cim_4x4_6_final.vec` – CIM NOR
 
@@ -122,10 +116,7 @@ To try a different operation in the CIM files, change the last three columns (`S
 | 7.0 | Hold |
 
 - MODE = 0, and S2 S1 S0 = 010 (NOR) is already in the vectors.
-- Pulse **`eno` ≈ 3.6 – 6.0 ns**, which is after the CIM rows have been on and RBL/RBLB/CRL have settled.
 - **Check:** **r0 r1 r2 r3 = 1 0 0 0**. RBL/RBLB/CRL should show the V<sub>DD</sub> / ⅔ / ½ levels per column.
-- Transient stop: 8 ns.
-
 ### 3. `cam_4x4_10_final.vec` – CAM search
 
 | Time (ns) | Phase |
@@ -137,11 +128,9 @@ To try a different operation in the CIM files, change the last three columns (`S
 | 6.5 | Hold |
 
 - MODE = 1 throughout.
-- **Make sure `camen` is turned ON**, at about **3.1 – 5.5 ns** (after the mismatched MLs have had time to discharge).
 - **Check:** ML0 stays high and **cam0 = 1** (Row 0 matches 0101).
 - cam1–cam3 depend on whatever Rows 1–3 power up holding. They are usually 0000, which is a mismatch, so ML discharges and the output is 0.
-- The header comment in this file ("Row 1 = 0101, expected NO MATCH") is out of date. The vectors only write **Row 0**.
-- Transient stop: 7 ns.
+- in the next case of cim+cam we have also taken up the case of 2 matches and 2 mismatches where as expected, ML line changes/retains behaviour. (refer to ppt for the same)
 
 ### 4. `cim_cam_ananya_version_5.vec` – mode switching (CIM → CAM)
 
@@ -156,20 +145,15 @@ To try a different operation in the CIM files, change the last three columns (`S
 | 12.5 – 13.5 | Search all rows (RWL0–3 = 1, RWL_CIM = 0) |
 | 14.5 | Hold |
 
-- Pulse **`eno` ≈ 3.6 – 6.0 ns** for the CIM part, and **`camen` ≈ 12.9 – 13.5 ns** for the CAM part. Keep `eno` low during the CAM phase.
 - **Check CIM:** **r0 r1 r2 r3 = 1 0 0 0**.
 - **Check CAM** (search = 0101 against Rows 0101 / 0011 / 0101 / 1011): **cam0 = 1, cam1 = 0, cam2 = 1, cam3 = 0**. ML1 and ML3 discharge.
-- Transient stop: **15 ns**. The "13 ns" in the file's footer comment is too short, because the file runs to 14.5 ns.
-
 ---
 
 ## Common mistakes / checklist
 
-- [ ] Every vector line has the same number of values as `vname`: 39 for the read and CAM files, 42 for the files with S2 S1 S0. A short line gives *SPECTRE-17701: insufficient number of arguments*.
-- [ ] There is no second DC source on Vdd (SPECTRE-620).
+- [ ] There is no second DC source on Vdd.
 - [ ] `eno` / `camen` rise **after** evaluation starts, not before.
-- [ ] `Vref` = 0.75 V.
-- [ ] S2 S1 S0 are set in the schematic for the write/read file.
+- [ ] S2 S1 S0 are set in the schematic for the write/read file if not in vec file.
 - [ ] The bitlines are precharged (RBL = RBLB = 1, CRL = 0) before every read or CIM operation.
 - [ ] The match lines are precharged, then released to Z, before every CAM search.
 - [ ] Turn WL off before releasing BL/BLB after a write.
