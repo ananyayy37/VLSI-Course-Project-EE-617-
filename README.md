@@ -1,6 +1,11 @@
 # VLSI-Course-Project-EE-617-
 We implemented the research paper on CICAM operation named "CICAM: A Reconfigurable SRAM-Based Computing-in-Content-Addressable Memory Architecture Using Charge Sharing" on Cadence Virtuoso at 28nm node CMOS Technology.
 
+[Presentation link](https://docs.google.com/presentation/d/1nmpDWJaG4V9wgoo9gqrcwAVpcxyrj994/edit?usp=sharing&ouid=110524869645017921125&rtpof=true&sd=true
+)
+
+[Video presentation link](https://drive.google.com/file/d/1mcouIVclMRw0VlhxC7-teuUdHYyvwPMj/view?usp=sharing)
+
 # File paths : 
 ## Schematics (library: `vlsi_project`)
 
