@@ -31,15 +31,13 @@ Bit order: index 0 is column 0, which is the **first** value of each 4-bit group
 
 ---
 
-## Signals that are NOT in the vector files (set these in the schematic)
+## Signals that are NOT in the vector files (to be set in the schematic while simulating)
 
 | Signal | Value / source | Notes |
 |---|---|---|
 | `eno` | Pulse source (0 V → 0.9 V) | Enable for the output-circuit sense amplifiers. **See the timing rule below.** |
 | `camen` | Pulse source (0 V → 0.9 V) | Enable for the CAM sense amplifiers on ML0-ML3. **See the timing rule below.** |
-| `Vref` | DC 0.75 V | SA reference; must sit between ⅔V<sub>DD</sub> and V<sub>DD</sub>. |
 | `S2 S1 S0` | DC sources, **only for `write_read_0101_4_4x4.vec`** | Set to 0 0 0 (READ). The other CIM files already drive S2 S1 S0 from the vector file. |
-| `vdd`, `gnd` | Driven by the vector file (vih = 0.9 V) | Do **not** also put a DC source on Vdd, or Spectre gives error as:  *SPECTRE-620: Node Vdd driven by multiple voltage sources*
 
 ---
 
