@@ -1,5 +1,32 @@
 # VLSI-Course-Project-EE-617-
 We implemented the research paper on CICAM operation named "CICAM: A Reconfigurable SRAM-Based Computing-in-Content-Addressable Memory Architecture Using Charge Sharing" on Cadence Virtuoso at 28nm node CMOS Technology.
+
+# File paths : 
+## Schematics (library: `vlsi_project`)
+
+| Schematic | Path | Remarks |
+|---|---|---|
+| cell_sram | `vlsi_project/cell_sram/schematic` | single CICAM cell |
+| write_sram | `vlsi_project/write_sram/schematic` | circuit to check write for 1 cell |
+| read_sram | `vlsi_project/read_sram/schematic` | circuit to check read for 1 cell |
+| vertical_stack | `vlsi_project/vertical_stack/schematic` | vertical stack to check CIM |
+| CAM_sram | `vlsi_project/CAM_sram/schematic` | Single cell CAM check |
+| SA | `vlsi_project/SA/schematic` | Sense Amp circuit |
+| SA_AND | `vlsi_project/SA_AND/schematic` | Sense Amp whose output is AND/NAND |
+| and | `vlsi_project/and/schematic` | 2 input "and" gate | 
+| and_trial | `vlsi_project/and_trial/schematic` | working of "and" gate |
+| or | `vlsi_project/or/schematic` | 2 input "or" gate |
+| or_trial | `vlsi_project/or_trial/schematic` | working of "or" gate |
+| cmos_mux | `vlsi_project/cmos_mux/schematic` | 2:1 mux |
+| mux | `vlsi_project/mux/schematic` | 8:1 mux |
+| OP | `vlsi_project/OP/schematic` | integrated output circuit |
+| OP_trial | `vlsi_project/OP_trial/schematic` | working of o/p circuit |
+| precharge | `vlsi_project/precharge/schematic` | precharge circuit as given by TAs |
+| pre_trail_hari | `vlsi_project/pre_trail_hari/schematic` | precharge circuit designed by us |
+| 2x2CICAM | `vlsi_project/2x2CICAM/schematic` | 2x2 array |
+| 4x4_CICAM | `vlsi_project/4x4_CICAM/schematic` | 4x4 array |
+| 8x8_CICAM | `vlsi_project/8x8_CICAM/schematic` | 8x8 array (not used for project) |
+
 # 4×4 CICAM Array - Vector File Instructions
 
 
