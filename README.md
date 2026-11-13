@@ -45,7 +45,7 @@ Bit order: index 0 is column 0, which is the **first** value of each 4-bit group
 
 The sense amplifier **precharges its outputs when the enable is 0 and evaluates when it is 1**. It latches whatever is on its inputs at the moment the enable rises. Therefore:
 
-1. ** Ensure that `eno` / `camen` is ON only AFTER the read / compute / search has developed**: after RWL (and RWL_CIM) are asserted and the bitlines or match lines have settled. If the enable rises too early, the SA latches the precharged (all-high) lines and gives a wrong result.
+1. Ensure that `eno` / `camen` is ON only AFTER the read / compute / search has developed: after RWL (and RWL_CIM) are asserted and the bitlines or match lines have settled. If the enable rises too early, the SA latches the precharged (all-high) lines and gives a wrong result.
 2. **Keep the enable LOW during write and precharge phases.**
 3. **Read r0-r3 / cam0-cam3 only while the enable is high.** When it is low, the outputs just show the SA precharge value.
 4. Keep the enable pulse inside the evaluation window, and turn it off before the next precharge.
