@@ -64,17 +64,19 @@ The sense amplifier **precharges its outputs when the enable is 0 and evaluates 
 `MODE` drives the RWL_CIM multiplexer: 0 = SRAM/CIM, 1 = CAM.
 
 ### Output-circuit select (S2 S1 S0)
+### Output-circuit select (S2 S1 S0)
 
-| S2 S1 S0 | Operation 
-|---|---|---|
-| 000 | READ
-| 001 | NOT
-| 010 | NOR 
-| 011 | OR 
-| 100 | NAND
-| 101 | AND 
-| 110 | XOR 
-| 111 | XNOR 
+| S2 S1 S0 | Operation |
+|---|---|
+| 000 | READ |
+| 001 | NOT |
+| 010 | NOR |
+| 011 | OR |
+| 100 | NAND |
+| 101 | AND |
+| 110 | XOR |
+| 111 | XNOR |
+
 ## Per-file instructions
 
 ### 1. `write_read_0101_4_4x4.vec` - write and read
