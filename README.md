@@ -13,6 +13,7 @@ Note: Please refer to the PPT and video for any additional information. They pro
 | `nor_cim_4x4_6_final.vec` | CIM NOR of Row 0 and Row 1 | 0 | 010 (NOR), in vector file | `eno` | r0 r1 r2 r3 = **1 0 0 0** |
 | `cam_4x4_10_final.vec` | CAM search for 0101 | 1 | not used | `camen` | cam0 = **1** (match) |
 | `cim_cam_ananya_version_5.vec` | CIM NOR, then switch to CAM search | 0 → 1 | 010 (NOR), in vector file | `eno`, then `camen` | r = **1000**, then cam0 cam1 cam2 cam3 = **1 0 1 0** |
+| `allselectlines.vec` | CIM on Row 0 (A = 0101) and Row 1 (B = 0011) for all 8 select codes, run one after another | 0 | 000 → 111, stepped in the vector file | `eno` (once per operation) | r0 r1 r2 r3 = **0001, 1110, 1000, 0111, 1110, 0001, 0110, 1001** |
 
 ---
 
@@ -66,81 +67,85 @@ The sense amplifier **precharges its outputs when the enable is 0 and evaluates 
 
 ### Output-circuit select (S2 S1 S0)
 
-| S2 S1 S0 | Operation | Result (A = 0101, B = 0011) |
+| S2 S1 S0 | Operation 
 |---|---|---|
-| 000 | READ | A |
-| 001 | NOT | Ā |
-| 010 | NOR | 1000 |
-| 011 | OR | 0111 |
-| 100 | NAND | 1110 |
-| 101 | AND | 0001 |
-| 110 | XOR | 0110 |
-| 111 | XNOR | 1001 |
-
+| 000 | READ
+| 001 | NOT
+| 010 | NOR 
+| 011 | OR 
+| 100 | NAND
+| 101 | AND 
+| 110 | XOR 
+| 111 | XNOR 
 ## Per-file instructions
 
 ### 1. `write_read_0101_4_4x4.vec` - write and read
 
-| Time (ns) | Phase |
+| Step | Phase |
 |---|---|
-| 0 | Everything off, MODE = 0 |
-| 0.2 | Write Row 0 = 0101 (WL0 = 1, BL = 0101, BLB = 1010) |
-| 0.7 | Release bitlines |
-| 1.0 | Precharge RBL = RBLB = 1, CRL = 0 |
-| 2.0 - 2.2 | Read Row 0 (RWL0 = RWL_CIM0 = 1) |
+| 1 | Everything off, MODE = 0 |
+| 2 | Write Row 0 = 0101 (WL0 = 1, BL = 0101, BLB = 1010) |
+| 3 | Release bitlines |
+| 4 | Precharge RBL = RBLB = 1, CRL = 0 |
+| 5 | Read Row 0 (RWL0 = RWL_CIM0 = 1) |
 
 - Set **S2 S1 S0 = 000** with DC sources in the schematic, because they are not in this vector file.
 - **Check:** a0-a3 = 0101 after the write; **r0 r1 r2 r3 = 0 1 0 1** while `eno` is high.
 
 ### 2. `nor_cim_4x4_6_final.vec` - CIM NOR
 
-| Time (ns) | Phase |
+| Step | Phase |
 |---|---|
-| 0.2 - 0.8 | Write A = 0101 into Row 0 |
-| 1.0 - 1.6 | Write B = 0011 into Row 1 |
-| 2.0 - 3.0 | Precharge RBL/RBLB = 1, CRL = 0, then release |
-| 3.2 - 6.2 | CIM: RWL0 = RWL1 = RWL_CIM0 = RWL_CIM1 = 1 |
-| 7.0 | Hold |
+| 1 | Write A = 0101 into Row 0 |
+| 2 | Write B = 0011 into Row 1 |
+| 3 | Precharge RBL/RBLB = 1, CRL = 0, then release |
+| 4 | CIM: RWL0 = RWL1 = RWL_CIM0 = RWL_CIM1 = 1 |
+| 5 | Hold |
 
 - MODE = 0, and S2 S1 S0 = 010 (NOR) is already in the vectors.
 - **Check:** **r0 r1 r2 r3 = 1 0 0 0**. RBL/RBLB/CRL should show the V<sub>DD</sub> / ⅔ / ½ levels per column.
+
 ### 3. `cam_4x4_10_final.vec` - CAM search
 
-| Time (ns) | Phase |
+| Step | Phase |
 |---|---|
-| 0.2 - 0.7 | Write Row 0 = 0101 |
-| 1.5 | Apply search data: RBL = 0101, RBLB = 1010 |
-| 2.5 | Precharge ML0-ML3 = 1 |
-| 2.7 - 5.7 | Search: RWL0-3 = 1, RWL_CIM = 0, ML released (Z) |
-| 6.5 | Hold |
+| 1 | Write Row 0 = 0101 |
+| 2 | Apply search data: RBL = 0101, RBLB = 1010 |
+| 3 | Precharge ML0-ML3 = 1 |
+| 4 | Search: RWL0-3 = 1, RWL_CIM = 0, ML released (Z) |
+| 5 | Hold |
 
 - MODE = 1 throughout.
 - **Check:** ML0 stays high and **cam0 = 1** (Row 0 matches 0101).
 - cam1-cam3 depend on whatever Rows 1-3 power up holding. They are usually 0000, which is a mismatch, so ML discharges and the output is 0.
-- in the next case of cim+cam we have also taken up the case of 2 matches and 2 mismatches where as expected, ML line changes/retains behaviour. (refer to ppt for the same)
+- The next case (CIM + CAM) also covers 2 matches and 2 mismatches; the ML lines discharge or hold as expected (refer to the ppt for the same).
 
 ### 4. `cim_cam_ananya_version_5.vec` - mode switching (CIM → CAM)
 
-| Time (ns) | Phase |
+| Step | Phase |
 |---|---|
-| 0.2 - 1.6 | Write Row 0 = 0101, Row 1 = 0011 |
-| 2.0 - 3.0 | Precharge |
-| 3.2 - 6.2 | CIM NOR of Row 0 and Row 1 (MODE = 0) |
-| 7.5 - 9.2 | Write Row 2 = 0101, Row 3 = 1011 |
-| 10.5 | **MODE = 1**; search data RBL = 0101, RBLB = 1010 |
-| 11.5 | Precharge ML0-ML3 |
-| 12.5 - 13.5 | Search all rows (RWL0-3 = 1, RWL_CIM = 0) |
-| 14.5 | Hold |
+| 1 | Write Row 0 = 0101, Row 1 = 0011 |
+| 2 | Precharge |
+| 3 | CIM NOR of Row 0 and Row 1 (MODE = 0) |
+| 4 | Write Row 2 = 0101, Row 3 = 1011 |
+| 5 | **MODE = 1**; search data RBL = 0101, RBLB = 1010 |
+| 6 | Precharge ML0-ML3 |
+| 7 | Search all rows (RWL0-3 = 1, RWL_CIM = 0) |
+| 8 | Hold |
 
-- **Check CIM:** **r0 r1 r2 r3 = 1 0 0 0**.
-- **Check CAM** (search = 0101 against Rows 0101 / 0011 / 0101 / 1011): **cam0 = 1, cam1 = 0, cam2 = 1, cam3 = 0**. ML1 and ML3 discharge.
+### 5. `allselectlines.vec` - all 8 select-line (S2 S1 S0) operations
+
+| Step | Phase |
+|---|---|
+| 1 | Write A = 0101 into Row 0 |
+| 2 | Write B = 0011 into Row 1 |
+| 3 | Set S2 S1 S0 to the next code (000 → 111) |
+| 4 | Precharge RBL = RBLB = 1, CRL = 0, then release |
+| 5 | CIM: RWL0 = RWL1 = RWL_CIM0 = RWL_CIM1 = 1 |
+| 6 | End compute; repeat steps 3-5 for all 8 codes |
+| 7 | Hold |
+
+\* READ and NOT are meant for a single active row. Here two rows are on, so the READ path (tapped from the AND output) gives A·B, and NOT gives its complement.
+
 ---
 
-## Common mistakes / checklist
-
-- [ ] There is no second DC source on Vdd.
-- [ ] `eno` / `camen` rise **after** evaluation starts, not before.
-- [ ] S2 S1 S0 are set in the schematic for the write/read file if not in vec file.
-- [ ] The bitlines are precharged (RBL = RBLB = 1, CRL = 0) before every read or CIM operation.
-- [ ] The match lines are precharged, then released to Z, before every CAM search.
-- [ ] Turn WL off before releasing BL/BLB after a write.
